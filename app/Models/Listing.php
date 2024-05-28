@@ -9,6 +9,11 @@ class Listing extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
+    // This is necessory for mass assiment otherwise form not submit.
+    // protected $fillable = ['company','title','location','email','website','tags','description'];
+    
     public function scopeFilter($query , array $filters){
         // dd($filters['search']);
         if($filters['tag'] ?? false){
