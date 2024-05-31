@@ -1,9 +1,10 @@
 <?php
 
-use App\Http\Controllers\ListingController;
+use Illuminate\Support\Facades\Route;
 // use App\Models\Listing;
 // use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ListingController;
+use App\Http\Controllers\GoogleSheetsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +21,9 @@ use Illuminate\Support\Facades\Route;
 //     return view('welcome');
 // });
 
+Route::get('/transfer-data', [GoogleSheetsController::class, 'transferData']);
+
+
 /////// Fetch All Listing   ///////
 Route::get('/', [ListingController::class , 'index']);
 
@@ -28,6 +32,17 @@ Route::get('/listing/create', [ListingController::class, 'create']);
 
 /////// Show Create Form  ///////
 Route::post('/listing', [ListingController::class, 'store']);
+
+/////// Show Edit Listing  ///////
+Route::get('/listing/{listing}/edit', [ListingController::class, 'edit']);
+
+/////// Update Listing  ///////
+Route::put('/listing/{listing}', [ListingController::class, 'update']);
+
+/////// Delete Listing  ///////
+Route::delete('/listing/{listing}', [ListingController::class, 'delete']);
+
+
 
 /////// Fetch Single Listing  ///////
 Route::get('/listing/{listing}', [ListingController::class, 'show']);
