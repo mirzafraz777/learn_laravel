@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 // use Illuminate\Http\Request;
 use App\Http\Controllers\ListingController;
 use App\Http\Controllers\GoogleSheetsController;
+use App\Http\Controllers\UserController;
+use Google\Service\Compute\Router;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,9 +50,22 @@ Route::delete('/listing/{listing}', [ListingController::class, 'delete']);
 Route::get('/listing/{listing}', [ListingController::class, 'show']);
 
 
+/////// Show Register Form  ///////
+Route::get('/register', [UserController::class, 'show']);
 
 
+/////// Submit Register Form  ///////
+Route::post('/register', [UserController::class, 'store']);
 
+/////// Show Login Form  ///////
+Route::get('/login', [UserController::class, 'showLogin']);
+
+/////// Submit Login Form  ///////
+Route::post('/login', [UserController::class, 'submitLogin']);
+
+
+/////// Logout  ///////
+Route::post('/logout', [UserController::class, 'logout']);
 
 
 
