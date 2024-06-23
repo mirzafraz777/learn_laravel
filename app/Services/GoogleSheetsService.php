@@ -4,8 +4,11 @@ namespace App\Services;
 
 use Google\Client;
 use Google\Service\Sheets;
-use Google\Service\Sheets\BatchUpdateValuesRequest;
+use Google\Service\Sheets\DataFilter;
 use Google\Service\Sheets\ValueRange;
+use Google\Service\Sheets\BatchClearValuesRequest;
+use Google\Service\Sheets\BatchUpdateValuesRequest;
+use Google\Service\Sheets\BatchGetValuesByDataFilterRequest;
 
 class GoogleSheetsService
 {
@@ -21,19 +24,19 @@ class GoogleSheetsService
         $this->service = new Sheets($this->client);
     }
 
-    public function batchGetValues($spreadsheetId, $givenRange)
+    public function batchGetValues($spreadsheetId, $givenRange, $dimension)
     {
         try {
 
             $params = array(
                 'ranges' => $givenRange,
-                'majorDimension' => 'ROWS'
+                'majorDimension' => $dimension
 
             );
             $result = $this->service->spreadsheets_values->batchGet($spreadsheetId, $params);
 
             // printf("%d ranges retrieved.", count($result->getValueRanges()));
-            return $result->getValueRanges();
+            return $result;
         } catch (\Throwable $th) {
             throw $th;
             // TODO(developer) - handle error appropriately
@@ -41,6 +44,66 @@ class GoogleSheetsService
 
         }
     }
+
+
+    function appendValues($spreadsheetId, $range, $valueInputOption, $appendValues)
+    {
+
+
+        try {
+
+            //execute the request
+            $body = new ValueRange([
+                'values' => [$appendValues], //add the values to be appended
+                'range' => $range,
+                'majorDimension' => 'COLUMNS'
+
+            ]);
+            $params = [
+                'valueInputOption' => $valueInputOption
+            ];
+
+            $result = $this->service->spreadsheets_values->append($spreadsheetId, $range, $body, $params);
+            // printf("%d cells appended.", $result->getUpdates()->getUpdatedCells());
+            return $result;
+        } catch (\Throwable $th) {
+            throw $th;
+            // TODO(developer) - handle error appropriately
+            // echo 'Message: ' .$e->getMessage();
+
+        }
+    }
+
+    public function getFilterValues($spreadsheetId, $givenRange)
+    {
+
+
+        $dataFilters[] = new DataFilter([
+            'a1Range' => $givenRange
+        ]);
+
+
+        $body = new BatchGetValuesByDataFilterRequest([
+            'dateTimeRenderOption'=>'SERIAL_NUMBER',
+            'majorDimension'=>'ROWS',
+            'valueRenderOption'=>'FORMATTED_VALUE',
+            'dataFilters'=>$dataFilters
+                      
+        ]);
+        // return $body;
+        try {
+
+            $result = $this->service->spreadsheets_values->batchGetByDataFilter($spreadsheetId, $body);
+            return $result->getValueRanges();
+        } catch (\Throwable $th) {
+
+            throw $th;
+            // TODO(developer) - handle error appropriately
+            // echo 'Message: ' .$e->getMessage();
+
+        }
+    }
+
 
     public function batchUpdateValues($spreadsheetId, $destinationRanges, $valueInputOption,  $sourceValues)
     {
@@ -64,8 +127,6 @@ class GoogleSheetsService
                     'range' => $destinationRange,
                     'values' => $sourceValues[$key]->values
                 ]);
-
-
             }
 
 
@@ -84,6 +145,21 @@ class GoogleSheetsService
             throw $th;
             // TODO(developer) - handle error appropriately
             // echo 'Message: ' .$e->getMessage();
+        }
+    }
+
+    public function batchClear($spreadsheetId, $givenRange)
+    {
+        $body = new BatchClearValuesRequest([
+            'ranges' => $givenRange
+        ]);
+
+        try {
+            //code...
+            $response = $this->service->spreadsheets_values->batchClear($spreadsheetId, $body);
+            return $response;
+        } catch (\Throwable $th) {
+            throw $th;
         }
     }
 }

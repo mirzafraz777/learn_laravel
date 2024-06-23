@@ -3,10 +3,10 @@
 use Illuminate\Support\Facades\Route;
 // use App\Models\Listing;
 // use Illuminate\Http\Request;
-use App\Http\Controllers\ListingController;
-use App\Http\Controllers\GoogleSheetsController;
 use App\Http\Controllers\UserController;
-use Google\Service\Compute\Router;
+use App\Http\Controllers\ListingController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\GoogleSheetsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,58 +24,64 @@ use Google\Service\Compute\Router;
 // });
 
 Route::get('/transfer-data', [GoogleSheetsController::class, 'transferData']);
+Route::get('/add-new-blog', [GoogleSheetsController::class, 'addNewBlog']);
+Route::get('/update-publisher-sheet', [GoogleSheetsController::class, 'highAuthority']);
+// Route::get('/clear-data', [GoogleSheetsController::class, 'clearSheetWithRange']);
 
 
-/////// Fetch All Listing   ///////
-Route::get('/', [ListingController::class , 'index']);
+Route::controller(ListingController::class)->group(function () {
+    /////// Fetch All Listing   ///////
+    Route::get('/', 'index');
 
-/////// Show Create Form  ///////
-Route::get('/listing/create', [ListingController::class, 'create']);
+    /////// Show Create Form  ///////
+    Route::get('/listing/create', 'create');
 
-/////// Show Create Form  ///////
-Route::post('/listing', [ListingController::class, 'store']);
+    /////// Show Create Form  ///////
+    Route::post('/listing', 'store');
 
-/////// Show Edit Listing  ///////
-Route::get('/listing/{listing}/edit', [ListingController::class, 'edit']);
+    /////// Show Edit Listing  ///////
+    Route::get('/listing/{listing}/edit', 'edit');
 
-/////// Update Listing  ///////
-Route::put('/listing/{listing}', [ListingController::class, 'update']);
+    /////// Update Listing  ///////
+    Route::put('/listing/{listing}', 'update');
 
-/////// Delete Listing  ///////
-Route::delete('/listing/{listing}', [ListingController::class, 'delete']);
-
-
-
-/////// Fetch Single Listing  ///////
-Route::get('/listing/{listing}', [ListingController::class, 'show']);
-
-
-/////// Show Register Form  ///////
-Route::get('/register', [UserController::class, 'show']);
-
-
-/////// Submit Register Form  ///////
-Route::post('/register', [UserController::class, 'store']);
-
-/////// Show Login Form  ///////
-Route::get('/login', [UserController::class, 'showLogin']);
-
-/////// Submit Login Form  ///////
-Route::post('/login', [UserController::class, 'submitLogin']);
-
-
-/////// Logout  ///////
-Route::post('/logout', [UserController::class, 'logout']);
+    /////// Delete Listing  ///////
+    Route::delete('/listing/{listing}', 'delete');
 
 
 
+    /////// Fetch Single Listing  ///////
+    Route::get('/listing/{listing}', 'show');
+});
+
+
+Route::controller(UserController::class)->group(function () {
+
+    /////// Show Register Form  ///////
+    Route::get('/register', 'show')->name('regiter');
+
+    /////// Submit Register Form  ///////
+    Route::post('/register', 'store')->name('register');
+
+    /////// Show Login Form  ///////
+    Route::get('/login', 'showLogin')->name('login');
+
+    /////// Submit Login Form  ///////
+    Route::post('/login', 'submitLogin')->name('login');
+
+    /////// Logout  ///////
+    Route::post('/logout', 'logout')->name('logout');
+});
 
 
 
-
-
-
-
+Route::get('/products',[ProductController::class, 'index'])->name('productsAll');
+Route::get('/products/create',[ProductController::class, 'create'])->name('productsCreate');
+Route::post('/products',[ProductController::class, 'store'])->name('productsStore');
+Route::get('/products/{id}/edit',[ProductController::class, 'edit'])->name('productsEdit');
+Route::put('/products/{id}',[ProductController::class, 'update'])->name('productsUpdate');
+Route::delete('/products/{id}',[ProductController::class, 'delete'])->name('productsDelete');
+Route::get('/products/{id}',[ProductController::class, 'show'])->name('productsShow');
 
 
 
